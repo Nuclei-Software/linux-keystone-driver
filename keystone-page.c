@@ -47,7 +47,7 @@ int epm_init(struct epm* epm, unsigned int min_pages)
   /* If buddy allocator fails, we fall back to the CMA */
   if (!epm_vaddr) {
     epm->is_cma = 1;
-    count = min_pages;
+    // count = min_pages; //TODO: count need to be 2^n for NAPOT only device
 
     epm_vaddr = (vaddr_t) dma_alloc_coherent(keystone_dev.this_device,
       count << PAGE_SHIFT,
@@ -72,6 +72,7 @@ int epm_init(struct epm* epm, unsigned int min_pages)
   epm->order = order;
   epm->size = count << PAGE_SHIFT;
   epm->ptr = epm_vaddr;
+  keystone_info("epm allocated %lu page(s) @ %px, CMA=%d\n", count, epm->pa, epm->is_cma);
 
   return 0;
 }
@@ -108,6 +109,6 @@ int utm_init(struct utm* utm, size_t untrusted_size)
     /* Instead of failing, we just warn that the user has to fix the parameter. */
     keystone_warn("shared buffer size is not multiple of PAGE_SIZE\n");
   }
-
+  keystone_info("utm allocated %lu page(s) @ %px\n", count, utm->ptr);
   return 0;
 }

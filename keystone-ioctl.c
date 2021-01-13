@@ -75,6 +75,9 @@ int keystone_finalize_enclave(unsigned long arg)
   // SM will write the eid to struct enclave.eid
   create_args.eid_vptr = &enclave->eid;
 
+  keystone_info("epm: addr %px, size %d; utm: addr %px, size %d\n", \
+    create_args.epm_region.paddr, create_args.epm_region.size, \
+    create_args.utm_region.paddr, create_args.utm_region.size);
   ret = SM_SBI_CALL_1(SBI_SM_CREATE_ENCLAVE, &create_args);
   if (ret) {
     keystone_err("keystone_create_enclave: SBI call failed\n");
@@ -212,7 +215,7 @@ long keystone_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 
   if (copy_from_user(data,(void __user *) arg, ioc_size))
     return -EFAULT;
-
+  // keystone_info("keystone_ioctl execute: cmd %x, %x\n", cmd, arg);
   switch (cmd) {
     case KEYSTONE_IOC_CREATE_ENCLAVE:
       ret = keystone_create_enclave(filep, (unsigned long) data);
@@ -239,9 +242,11 @@ long keystone_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
     default:
       return -ENOSYS;
   }
+  // keystone_info("keystone_ioctl finish: cmd %x, %x\n", cmd, arg);
 
   if (copy_to_user((void __user*) arg, data, ioc_size))
     return -EFAULT;
+  // keystone_info("keystone_ioctl return: cmd %x, %x\n", cmd, arg);
 
   return ret;
 }

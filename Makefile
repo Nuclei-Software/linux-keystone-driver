@@ -11,9 +11,10 @@ else
 
 PWD := $(shell pwd)
 LINUXSRC := $(PWD)/../linux
+CROSS_COMPILE ?= riscv-nuclei-linux-gnu-
 
 default:
-	$(MAKE) -C $(LINUXSRC) ARCH=riscv CROSS_COMPILE=riscv64-unknown-linux-gnu- M=$(PWD)
+	$(MAKE) -C $(LINUXSRC) ARCH=riscv CROSS_COMPILE=$(CROSS_COMPILE) M=$(PWD)
 
 endif
 
